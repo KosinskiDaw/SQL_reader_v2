@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PLC Data Dashboard</title>
+    <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+        .value {
+            font-size: 2em;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>Aktualne dane z PLC:</h2>
+        <div class="value" id="plc-data">Ładowanie...</div>
+        <div class="value" id="plc-data2">Ładowanie...</div>
+    </div>
+
+    <script>
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+        // Nasłuchiwanie na dane od SocketIO
+        socket.on('update_data', function(msg) {
+            document.getElementById('plc-data').innerText = msg.data;
+        });
+        socket.on('update_data2', function(msg) {
+            document.getElementById('plc-data2').innerText = msg.data;
+        });
+    </script>
+</body>
+</html>

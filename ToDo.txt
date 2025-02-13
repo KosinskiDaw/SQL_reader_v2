@@ -1,0 +1,10 @@
+Parametry:
+IP address
+slot
+rack
+start byte
+end byte
+
+Rodzaje danych, index od którego się zaczynają
+
+
