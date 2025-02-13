@@ -31,7 +31,7 @@ def read_data_from_PLC():
         while running and conn: 
         # Emitowanie danych do klienta przez SocketIO
    
-            socketio.emit('update_data', {'data': plc.read_data_from_PLC(generalS7, db_no, start_byte, end_byte, conv, "get_real", 2)})
+            socketio.emit('update_data1', {'data': plc.read_data_from_PLC(generalS7, db_no, start_byte, end_byte, conv, "get_real", 2)})
             socketio.emit('update_data2', {'data': plc.read_data_from_PLC(generalS7, db_no, start_byte, end_byte, conv, "get_real", 6)})
             time.sleep(2)
     except Exception as e:

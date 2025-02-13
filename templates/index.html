@@ -38,7 +38,7 @@
         var socket = io.connect('http://' + document.domain + ':' + location.port);
 
         // Nasłuchiwanie na dane od SocketIO
-        socket.on('update_data', function(msg) {
+        socket.on('update_data1', function(msg) {
             document.getElementById('plc-data').innerText = msg.data;
         });
         socket.on('update_data2', function(msg) {
