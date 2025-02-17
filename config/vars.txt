@@ -1,0 +1,2 @@
+value1 Real 2.0
+value2 Real 2.0

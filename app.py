@@ -21,7 +21,7 @@ end_byte = 100
 app = Flask(__name__)
 socketio = SocketIO(app, async_mode='eventlet')  
 running = True  
-
+conn = False
 
 conn = generalS7.connect(IP, rack, slot)
 print(f"Connection status: {conn}")
@@ -45,21 +45,26 @@ def read_data_from_PLC():
 def index():
     return render_template('index.html')
 
+
+
+
 if __name__ == "__main__":
-
-    data_thread = threading.Thread(target=read_data_from_PLC, daemon=True)
-    data_thread.start()
-
+    if conn:
+        data_thread = threading.Thread(target=read_data_from_PLC, daemon=True)
+        data_thread.start()
+    
     try:
-   
-        socketio.run(app, host='0.0.0.0', port=5000)
+    
+            socketio.run(app, host='0.0.0.0', port=5000)
     except KeyboardInterrupt:
-        print("\nProgram zakończony za pomocą Ctrl+C.")
+            print("\nProgram zakończony za pomocą Ctrl+C.")
     finally:
-        
-        running = False
-        data_thread.join()  
-        print("Wątek zakończył działanie.")
+            
+            running = False
+            if conn:
+                data_thread.join()
+            print("Wątek zakończył działanie.")
 
-        socketio.stop()
-        print("SocketIO zatrzymane.")
+            socketio.stop()
+            print("SocketIO zatrzymane.")
+    
