@@ -6,9 +6,9 @@ def connect(IP, rack, slot):
         plc.connect(IP, rack, slot)
     except Exception as e:
         print(f"Connection to PLC failed: {str(e)}")
-        return False
-
-    return plc.get_connected()
+        return plc.get_connected()
+    finally:
+        return plc.get_connected()
 
 def disconnect():
     plc.disconnect()

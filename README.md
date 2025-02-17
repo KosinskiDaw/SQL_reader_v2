@@ -17,3 +17,8 @@ python app.py
 ```
 5. Packages in venv, show packages in the requirements file
 pip freeze
+
+6. Download latest version from the source repository
+---
+git pull origin main 
+---
