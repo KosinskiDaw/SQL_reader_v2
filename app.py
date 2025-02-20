@@ -34,35 +34,34 @@ print(f"Connection status: {conn}")
 
 
 
-def read_data_from_PLC(): 
-    try:
-        global conn
-        while running and conn: 
-        # Emitowanie danych do klienta przez SocketIO
-   
-            socketio.emit('update_data1', {'data': plc.read_data_from_PLC(generalS7, db_no, start_byte, end_byte, conv, "get_real", 2)})
-            socketio.emit('update_data2', {'data': plc.read_data_from_PLC(generalS7, db_no, start_byte, end_byte, conv, "get_real", 6)})
-            time.sleep(2)
-    except Exception as e:
-        print(f"Error reading data from PLC: {str(e)}")
-    finally:
-        if conn:
-            generalS7.disconnect()
-            print("Disconnected from PLC.")
+def read_data_from_PLC():
+    global conn
 
-def check_connection():
-        global conn
-        while True:
-             if conn:
-                print(f"Connection status: {conn}")
-                time.sleep(2)
-             else:
-                conn = generalS7.connect(IP, rack, slot)
-                print(f"Connection status: {conn}")
-                time.sleep(2)
-        
-    
-        
+    while running:
+        if conn:  
+            try:
+                # Read request
+                read_request = plc.read_data_from_PLC(generalS7, db_no, start_byte, end_byte, conv, "get_bool", 14, 0)
+                if read_request is None:
+                    raise Exception("PLC not responding.")
+                # Live bit
+                socketio.emit('update_data1', {'data': plc.read_data_from_PLC(generalS7, db_no, start_byte, end_byte, conv, "get_bool", 0,0)})
+                if read_request is True:
+                    socketio.emit('update_data2', {'data': plc.read_data_from_PLC(generalS7, db_no, start_byte, end_byte, conv, "get_dtl", 2,0)})
+                    
+            except Exception as e:
+                print(f"Error reading data from PLC: {str(e)}")
+                conn = None  
+                generalS7.disconnect()
+                print("Disconnected from PLC due to an error.")
+        else:
+            print("Waiting for reconnection...")
+            conn = generalS7.connect(IP, rack, slot)  
+            time.sleep(2)  
+
+        time.sleep(2)  
+
+  
     
              
 
@@ -74,11 +73,9 @@ def index():
 
 
 if __name__ == "__main__":
-    # if conn:
     data_thread = threading.Thread(target=read_data_from_PLC, daemon=True)
     data_thread.start()
-    conn_thread = threading.Thread(target=check_connection,daemon=True)
-    conn_thread.start()
+
 
     try:
     
@@ -90,9 +87,8 @@ if __name__ == "__main__":
             running = False
             
             data_thread.join()
-            conn_thread.join()
             print("Wątek zakończył działanie.")
-
+            generalS7.disconnect()
             socketio.stop()
             print("SocketIO zatrzymane.")
     
