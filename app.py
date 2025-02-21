@@ -21,56 +21,89 @@ db_no = int(conn_param[3])
 start_byte = int(conn_param[4])
 end_byte = int(conn_param[5])
 
-db_param_name = txt_operation.read_lines_config(0)
-print(db_param_name)
-db_param_var = txt_operation.read_lines_config(1)
-print(db_param_var)
-db_param_index = txt_operation.read_lines_config(2)
-print(db_param_index)
+
 """ --------------------------------------------------------------- """
 
 running = True  
 
 
 conn = generalS7.connect(IP, rack, slot)
-print(f"Connection status: {conn}")
+# print(f"Connection status: {conn}")
 
+def build_structure_name():
+    db_param_name = txt_operation.read_lines_config(0)
+    return db_param_name
+def build_structure_var():
+    db_param_var = txt_operation.read_lines_config(1)
+    return db_param_var
 
+def build_structure_index():
+    db_param_index = txt_operation.read_lines_config(2)
+    return db_param_index
 
 def read_data_from_PLC():
     global conn
     global IP, rack, slot, db_no, start_byte, end_byte
+    name = []
+    var = []
+    index = []
+
+    for i in range(len(build_structure_name())):
+        name.append(str(build_structure_name()[i].strip().lower()))
+    for i in range(len(build_structure_var())):
+        var.append(str(build_structure_var()[i].strip().lower()))
+    for i in range(len(build_structure_index())):
+        index.append(int(str(build_structure_index()[i].strip().split('.')[0])))
+
+
+
+    
+    
     while running:
         if conn:  
             try:
                 # Read request
                 read_request = plc.read_data_from_PLC(generalS7, db_no, start_byte, end_byte, conv, "get_bool", 14, 0)
                 if read_request is None:
-                    # Read connection parameters
-                    conn_param = txt_operation.read_lines_conn_param()
-                    IP = str(conn_param[0])
-                    rack = int(conn_param[1])
-                    slot = int(conn_param[2])
-                    db_no = int(conn_param[3])
-                    start_byte = int(conn_param[4])
-                    end_byte = int(conn_param[5])
                     raise Exception("PLC not responding.")
                 # Live bit
-                socketio.emit('update_data1', {'data': plc.read_data_from_PLC(generalS7, db_no, start_byte, end_byte, conv, "get_bool", 0,0)})
+                socketio.emit('update_data0', {'data': plc.read_data_from_PLC(generalS7, db_no, start_byte, end_byte, conv, "get_bool", 0,0)})
+
                 if read_request is True:
-                    socketio.emit('update_data2', {'data': plc.read_data_from_PLC(generalS7, db_no, start_byte, end_byte, conv, "get_dtl", 2,0)})
+                    a =[]
+                    #  Tutaj będą dane odczytywane z PLC i zapisywane do sql po wystawieniu przez PLC request
+                    for i in range(1,len(build_structure_index())):
+                        socketio.emit(f'update_data{i}', {'data': plc.read_data_from_PLC(generalS7, db_no, start_byte, end_byte, conv, f"get_{var[i]}", index[i],0)})
+                        # a.append(plc.read_data_from_PLC(generalS7, db_no, start_byte, end_byte, conv, f"get_{var[i]}", index[i],0))
+                    # DTL psuje wszystko!!!!!!!!!!!!!!!!!!!!
+                    # print(a)
+                    # Delete request 
+                    generalS7.write_data(db_no, 14, bytearray([0]))
                     
             except Exception as e:
                 print(f"Error reading data from PLC: {str(e)}")
-                conn = None  
+                conn = None
+                IP = None
+                rack = None
+                slot = None
+                db_no = None
+                start_byte = None
+                end_byte = None 
                 generalS7.disconnect()
                 print("Disconnected from PLC due to an error.")
         else:
             print("Waiting for reconnection...")
+            conn_param = txt_operation.read_lines_conn_param()
+            IP = str(conn_param[0])
+            rack = int(conn_param[1])
+            slot = int(conn_param[2])
+            db_no = int(conn_param[3])
+            start_byte = int(conn_param[4])
+            end_byte = int(conn_param[5])
             conn = generalS7.connect(IP, rack, slot)  
             time.sleep(2)  
 
-        time.sleep(2)  
+        time.sleep(0.3)  
 
   
     

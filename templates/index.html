@@ -30,20 +30,34 @@
 <body>
     <div class="card">
         <h2>Aktualne dane z PLC:</h2>
-        <div class="value" id="plc-data">Ładowanie...</div>
+        <div class="value" id="plc-data0">Ładowanie...</div>
+        <div class="value" id="plc-data1">Ładowanie...</div>
         <div class="value" id="plc-data2">Ładowanie...</div>
+        <div class="value" id="plc-data3">Ładowanie...</div>
+        <div class="value" id="plc-data4">Ładowanie...</div>
+        <div class="value" id="plc-data5">Ładowanie...</div>
+        <div class="value" id="plc-data6">Ładowanie...</div>
+        <div class="value" id="plc-data7">Ładowanie...</div>
+        <div class="value" id="plc-data8">Ładowanie...</div>
+        <div class="value" id="plc-data9">Ładowanie...</div>
+        <div class="value" id="plc-data10">Ładowanie...</div>
+        <div class="value" id="plc-data11">Ładowanie...</div>
+        <div class="value" id="plc-data12">Ładowanie...</div>
+        <div class="value" id="plc-data13">Ładowanie...</div>
+        <div class="value" id="plc-data14">Ładowanie...</div>
     </div>
 
     <script>
         var socket = io.connect('http://' + document.domain + ':' + location.port);
-
+        socket.on('update_data0', function(msg) {
+            document.getElementById('plc-data0').innerText = msg.data;
+        });
         // Nasłuchiwanie na dane od SocketIO
-        socket.on('update_data1', function(msg) {
-            document.getElementById('plc-data').innerText = msg.data;
-        });
-        socket.on('update_data2', function(msg) {
-            document.getElementById('plc-data2').innerText = msg.data;
-        });
+         for(let i = 1; i <16; i++){
+         socket.on('update_data'+i, function(msg) {
+             document.getElementById('plc-data'+i).innerText = msg.data;
+         });
+     }
     </script>
 </body>
 </html>
