@@ -4,8 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PLC Data Dashboard</title>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
     <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
-    <style>
+    <!-- <style>
         body {
             font-family: Arial, sans-serif;
             display: flex;
@@ -25,12 +30,23 @@
             font-size: 2em;
             color: #333;
         }
-    </style>
+    </style> -->
 </head>
 <body>
+    
+    <div class="topnav">
+        <a class="active" href="#home">Home</a>
+        <a href="/data">Data</a>
+        <a href="/settings">Settings</a>
+      </div>
+      <div>
+        <p>Live Bit Status:</p>
+        
+        <div id="lamp"></div>
+      </div>
     <div class="card">
         <h2>Aktualne dane z PLC:</h2>
-        <div class="value" id="plc-data0">Ładowanie...</div>
+        
         <div class="value" id="plc-data1">Ładowanie...</div>
         <div class="value" id="plc-data2">Ładowanie...</div>
         <div class="value" id="plc-data3">Ładowanie...</div>
@@ -48,12 +64,24 @@
     </div>
 
     <script>
+        function addData(value) {
+            const lamp = document.querySelector('#lamp')
+            
+            a = value;
+
+            if (a != null && a !=0) {
+                lamp.style.background = "green";
+            } else {
+                lamp.style.background = "red";
+            }
+        }
+
         var socket = io.connect('http://' + document.domain + ':' + location.port);
-        socket.on('update_data0', function(msg) {
-            document.getElementById('plc-data0').innerText = msg.data;
+        socket.on('live_bit', function(msg) {
+            addData(msg.data);
         });
         // Nasłuchiwanie na dane od SocketIO
-         for(let i = 1; i <16; i++){
+         for(let i = 0; i <16; i++){
          socket.on('update_data'+i, function(msg) {
              document.getElementById('plc-data'+i).innerText = msg.data;
          });

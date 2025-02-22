@@ -6,8 +6,10 @@ import lib.generalS7 as generalS7
 import lib.conversions as conv
 import lib.read_data_plc as plc
 import lib.txt_operation as txt_operation
+import lib.general_db as general_db
 import threading
 import time
+import json
 
 
 app = Flask(__name__)
@@ -20,8 +22,6 @@ slot = int(conn_param[2])
 db_no = int(conn_param[3])
 start_byte = int(conn_param[4])
 end_byte = int(conn_param[5])
-
-
 """ --------------------------------------------------------------- """
 
 running = True  
@@ -60,6 +60,9 @@ def read_data_from_PLC():
     
     
     while running:
+        db_conn = general_db.conn_to_sqlite()
+        print(name)
+        general_db.create_table(name)
         if conn:  
             try:
                 # Read request
@@ -67,16 +70,17 @@ def read_data_from_PLC():
                 if read_request is None:
                     raise Exception("PLC not responding.")
                 # Live bit
-                socketio.emit('update_data0', {'data': plc.read_data_from_PLC(generalS7, db_no, start_byte, end_byte, conv, "get_bool", 0,0)})
+                socketio.emit('live_bit', {'data': plc.read_data_from_PLC(generalS7, db_no, start_byte, end_byte, conv, "get_bool", 0,0)})
 
                 if read_request is True:
-                    a =[]
+                    data =[]
+                    data.clear()
                     #  Tutaj będą dane odczytywane z PLC i zapisywane do sql po wystawieniu przez PLC request
                     for i in range(1,len(build_structure_index())):
                         socketio.emit(f'update_data{i}', {'data': plc.read_data_from_PLC(generalS7, db_no, start_byte, end_byte, conv, f"get_{var[i]}", index[i],0)})
-                        # a.append(plc.read_data_from_PLC(generalS7, db_no, start_byte, end_byte, conv, f"get_{var[i]}", index[i],0))
-                    # DTL psuje wszystko!!!!!!!!!!!!!!!!!!!!
-                    # print(a)
+                        data.append(plc.read_data_from_PLC(generalS7, db_no, start_byte, end_byte, conv, f"get_{var[i]}", index[i],0))
+                    print(data)
+                   
                     # Delete request 
                     generalS7.write_data(db_no, 14, bytearray([0]))
                     
@@ -113,6 +117,23 @@ def read_data_from_PLC():
 def index():
     return render_template('index.html')
 
+@app.route('/data')
+def data():
+    return render_template('table_window.html')
+
+@app.route('/data/get', methods=['GET'])
+def get():
+    conn = general_db.conn_to_sqlite()
+    cursor = conn.cursor()
+    # Pobierz dane
+    cursor.execute('SELECT * process_values')
+    data = cursor.fetchall() 
+    # Pobierz nazwy kolumn w kolejności
+    column_names = [description[0] for description in cursor.description]
+    json_data = [dict(zip(column_names, row)) for row in data]
+    conn.close()
+    # Przygotuj dane w odpowiednim formacie
+    return jsonify({"columns": column_names, "data": json_data})
 
 
 

@@ -1,11 +1,20 @@
+import json
+
+
 def read_data_from_PLC(generalS7,db_no, start_byte, end_byte, conv, var_type, var_byte, var_bool_no):
     try:
             data = generalS7.read_data(db_no, start_byte, end_byte)
-            print(var_type)
+            # print(var_type)
             # print(f"Raw data: {data}")
             method_to_call = getattr(conv, var_type)
             if var_type == "get_bool":
                  converted_data = method_to_call(data, var_byte ,var_bool_no)
+            
+            elif var_type == "get_dtl":
+                converted_data = method_to_call(data, var_byte)
+                converted_data = json.dumps(converted_data, default=str)
+                
+                 
             else:
                 converted_data = method_to_call(data, var_byte)
             # print(f"Converted data: {converted_data}")

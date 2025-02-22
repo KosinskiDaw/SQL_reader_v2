@@ -1,0 +1,130 @@
+.container{
+    height: auto;
+    width: auto;
+  
+}
+table {
+    width: 100%;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(247, 208, 208, 0.1);
+    text-align: center;
+    border-collapse: collapse; 
+}
+
+tr {
+    background: #333;
+    color:white
+}
+
+.header {
+    width: 100%;
+    height: 50px;
+    background: linear-gradient(to bottom, #04AA6D, #333);
+    color: rgb(234, 241, 247);
+    text-align: center;
+    top: 0;
+    z-index: 1;
+    position: sticky;  
+}
+
+tr:hover {
+    background-color: #04AA6D;
+}
+
+
+.header-buttons {
+    position: sticky;
+    bottom: 0;
+    z-index: 1; /* Wyższy z-index niż nagłówek tabeli */
+    background-color: #333; /* Tło dla lepszej widoczności */
+    text-align: center; /* Centruje przyciski w poziomie */ 
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 15px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    color: #fff;
+    background-color: #04AA6D;
+    border: none;
+    border-radius: 10px;
+    margin: 0 5px; /* Dodaje odstępy między przyciskami */
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+body{
+    background-color: #333;
+    color: white;
+}
+.welcome{
+    display: block;
+    text-align: center;
+    background-color: #04AA6D;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    font-size: large;
+    
+}
+
+/* Add a black background color to the top navigation */
+.topnav {
+    background-color: #333;
+    overflow: hidden;
+  }
+  
+  /* Style the links inside the navigation bar */
+  .topnav a {
+    float: left;
+    color: #f2f2f2;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;
+  }
+  
+  /* Change the color of links on hover */
+  .topnav a:hover {
+    background-color: #ddd;
+    color: black;
+  }
+  
+  /* Add a color to the active/current link */
+  .topnav a.active {
+    background-color: #04AA6D;
+    color: white;
+  }
+/* Stylizacja lampki */
+#lamp {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: inline-block;
+    background: red;
+}
+#lamp.green {
+    background-color: green;
+}
+#lamp.red {
+    background-color: red;
+}
+
+#js-div{
+    width: 100vw;
+    
+    display: flex;
+    justify-content: center; 
+      
+}
+
+#json-editor{
+    background-color: #04AA6D;
+    color:white ;
+}
+
+.selected {
+    background-color: #04AA6D; /* Jasnoszary */
+}
