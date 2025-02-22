@@ -1,20 +1,41 @@
 $(document).ready(function () {
+// document.getElementById('filterButtonByDate').addEventListener('click', function() {
+//     var inputDate = prompt('Enter date (YYYY-MM-DD):');
+//     var table = document.getElementById('dataTable');
+//     var rows = table.getElementsByTagName('tr');
+//     for (var i = 0; i < rows.length; i++) {
+//         var actualDateCell = rows[i].querySelectorAll('td')[rows[i].querySelectorAll('td').length - rows[i].querySelectorAll('td').length + 1]; // Last column (... .length - 1 )
+//         if (actualDateCell) {
+//             var actualDate = actualDateCell.textContent.trim().split(' ')[0]; // Extracting date part
+//             if (inputDate === actualDate) {
+//                 rows[i].style.display = '';
+//             } else {
+//                 rows[i].style.display = 'none';
+//             }
+//         }
+//     }
+// });
+
 document.getElementById('filterButtonByDate').addEventListener('click', function() {
-    var inputDate = prompt('Enter date (YYYY-MM-DD):');
+
+    var inputSerialNo = prompt('Copy and paste date from row:');
     var table = document.getElementById('dataTable');
     var rows = table.getElementsByTagName('tr');
     for (var i = 0; i < rows.length; i++) {
-        var actualDateCell = rows[i].querySelectorAll('td')[rows[i].querySelectorAll('td').length - 8]; // Last column (... .length - 1 )
-        if (actualDateCell) {
-            var actualDate = actualDateCell.textContent.trim().split(' ')[0]; // Extracting date part
-            if (inputDate === actualDate) {
-                rows[i].style.display = '';
-            } else {
-                rows[i].style.display = 'none';
+    
+            var serialNoCell = rows[i].querySelectorAll('td')[rows[i].querySelectorAll('td').length - rows[i].querySelectorAll('td').length + 1 ]; // Material column
+            if (serialNoCell) {
+                var serialNo = serialNoCell.textContent.trim();
+                if (inputSerialNo === serialNo) {
+                    rows[i].style.display = '';
+                } else {
+                    rows[i].style.display = 'none';
+                }
             }
-        }
+    
+    
     }
-});
+    });
 
 document.getElementById('filterButtonBySerialNo').addEventListener('click', function() {
 
@@ -23,7 +44,7 @@ var table = document.getElementById('dataTable');
 var rows = table.getElementsByTagName('tr');
 for (var i = 0; i < rows.length; i++) {
 
-        var serialNoCell = rows[i].querySelectorAll('td')[rows[i].querySelectorAll('td').length - 11]; // Material column
+        var serialNoCell = rows[i].querySelectorAll('td')[rows[i].querySelectorAll('td').length - rows[i].querySelectorAll('td').length + 2 ]; // Material column
         if (serialNoCell) {
             var serialNo = serialNoCell.textContent.trim();
             if (inputSerialNo === serialNo) {

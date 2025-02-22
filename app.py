@@ -9,7 +9,7 @@ import lib.txt_operation as txt_operation
 import lib.general_db as general_db
 import threading
 import time
-import json
+
 
 
 app = Flask(__name__)
@@ -56,33 +56,43 @@ def read_data_from_PLC():
         index.append(int(str(build_structure_index()[i].strip().split('.')[0])))
 
 
-
-    
-    
+    # Tworzenie tabeli w przyszłości za pomocą strony
+    g_db = general_db.conn_to_sqlite()
+    general_db.create_table(name)
+    # -----------------------------------------------
     while running:
-        db_conn = general_db.conn_to_sqlite()
-        print(name)
-        general_db.create_table(name)
+        
+        
         if conn:  
             try:
                 # Read request
-                read_request = plc.read_data_from_PLC(generalS7, db_no, start_byte, end_byte, conv, "get_bool", 14, 0)
+                read_request = plc.read_data_from_PLC(generalS7, db_no, start_byte, end_byte, conv, "get_bool", 0, 0)
                 if read_request is None:
                     raise Exception("PLC not responding.")
                 # Live bit
-                socketio.emit('live_bit', {'data': plc.read_data_from_PLC(generalS7, db_no, start_byte, end_byte, conv, "get_bool", 0,0)})
+                socketio.emit('live_bit', {'data': plc.read_data_from_PLC(generalS7, db_no, start_byte, end_byte, conv, "get_bool", 0,1)})
 
                 if read_request is True:
                     data =[]
+                    
                     data.clear()
-                    #  Tutaj będą dane odczytywane z PLC i zapisywane do sql po wystawieniu przez PLC request
-                    for i in range(1,len(build_structure_index())):
+                    data.insert(0, None) # Set None for auto-increment id
+                   
+                    for i in range(0,len(build_structure_index())):
+                        # Wyświetlanie wysłanych danych (dane aktualne)
                         socketio.emit(f'update_data{i}', {'data': plc.read_data_from_PLC(generalS7, db_no, start_byte, end_byte, conv, f"get_{var[i]}", index[i],0)})
-                        data.append(plc.read_data_from_PLC(generalS7, db_no, start_byte, end_byte, conv, f"get_{var[i]}", index[i],0))
-                    print(data)
+                        # Zapis danych z PLC do tablicy
+                        data.append(str(plc.read_data_from_PLC(generalS7, db_no, start_byte, end_byte, conv, f"get_{var[i]}", index[i],0)))
+                    
+                    # print(data)
+                    # Zapis danych do sql
+                    cursor = g_db.cursor()
+                    general_db.insert_data(cursor, *data)
+                    
+                    
                    
                     # Delete request 
-                    generalS7.write_data(db_no, 14, bytearray([0]))
+                    generalS7.write_data(db_no, 0, bytearray([0]))
                     
             except Exception as e:
                 print(f"Error reading data from PLC: {str(e)}")
@@ -126,14 +136,13 @@ def get():
     conn = general_db.conn_to_sqlite()
     cursor = conn.cursor()
     # Pobierz dane
-    cursor.execute('SELECT * process_values')
-    data = cursor.fetchall() 
+    data = general_db.read_data(cursor) 
     # Pobierz nazwy kolumn w kolejności
     column_names = [description[0] for description in cursor.description]
     json_data = [dict(zip(column_names, row)) for row in data]
     conn.close()
     # Przygotuj dane w odpowiednim formacie
-    return jsonify({"columns": column_names, "data": json_data})
+    return {"columns": column_names, "data": json_data}
 
 
 
@@ -154,6 +163,7 @@ if __name__ == "__main__":
             data_thread.join()
             print("Wątek zakończył działanie.")
             generalS7.disconnect()
+            general_db.conn_close()
             socketio.stop()
             print("SocketIO zatrzymane.")
     

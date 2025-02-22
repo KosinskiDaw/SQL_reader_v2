@@ -20,6 +20,18 @@ def add_column(column):
     c.cursor()
     c.execute(f"ALTER TABLE process_values ADD COLUMN {column}")
 
+def insert_data(cursor, *values):
+
+    # print(f"Wstawiane wartości: {values}")
+    cursor.execute(f"INSERT INTO process_values  VALUES ({','.join(['?' for _ in values])})", values)
+    cursor.connection.commit()
+
+def read_data(cursor):
+    data = []
+    for row in cursor.execute(f'SELECT * FROM process_values;'):
+        data.append(row)
+    return data
+
 def conn_close():
     conn_to_sqlite().commit()
     conn_to_sqlite().close()
