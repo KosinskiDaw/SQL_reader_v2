@@ -18,6 +18,8 @@ python app.py
 5. Packages in venv, show packages in the requirements file
 ```
 pip freeze
+pip install Flask Flask-SocketIO eventlet
+
 ```
 6. Download latest version from the source repository
 ```
