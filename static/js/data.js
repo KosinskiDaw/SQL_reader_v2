@@ -18,15 +18,16 @@ $(document).ready(function () {
 
 document.getElementById('filterButtonByDate').addEventListener('click', function() {
 
-    var inputSerialNo = prompt('Copy and paste date from row:');
+    var inputSerialNo = prompt('Input date or time.:');
     var table = document.getElementById('dataTable');
     var rows = table.getElementsByTagName('tr');
     for (var i = 0; i < rows.length; i++) {
     
-            var serialNoCell = rows[i].querySelectorAll('td')[rows[i].querySelectorAll('td').length - rows[i].querySelectorAll('td').length + 1 ]; // Material column
-            if (serialNoCell) {
-                var serialNo = serialNoCell.textContent.trim();
-                if (inputSerialNo === serialNo) {
+            var actualDateCell = rows[i].querySelectorAll('td')[rows[i].querySelectorAll('td').length - rows[i].querySelectorAll('td').length + 1 ]; // Material column
+            if (actualDateCell) {
+                var date = actualDateCell.textContent.trim();
+                if (date.includes(inputSerialNo)) {
+                    
                     rows[i].style.display = '';
                 } else {
                     rows[i].style.display = 'none';

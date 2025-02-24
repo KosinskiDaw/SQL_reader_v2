@@ -44,6 +44,7 @@ def build_structure_index():
 def read_data_from_PLC():
     global conn
     global IP, rack, slot, db_no, start_byte, end_byte
+    connected = None
     name = []
     var = []
     index = []
@@ -59,11 +60,16 @@ def read_data_from_PLC():
     # Tworzenie tabeli w przyszłości za pomocą strony
     g_db = general_db.conn_to_sqlite()
     general_db.create_table(name)
+  
     # -----------------------------------------------
     while running:
         
         
-        if conn:  
+        if conn: 
+            if not connected:
+                 print("Connection to PLC established")
+                 connected = True 
+            
             try:
                 # Read request
                 read_request = plc.read_data_from_PLC(generalS7, db_no, start_byte, end_byte, conv, "get_bool", 0, 0)
@@ -102,7 +108,8 @@ def read_data_from_PLC():
                 slot = None
                 db_no = None
                 start_byte = None
-                end_byte = None 
+                end_byte = None
+                connected = None 
                 generalS7.disconnect()
                 print("Disconnected from PLC due to an error.")
         else:
