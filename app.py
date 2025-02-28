@@ -48,19 +48,25 @@ def read_data_from_PLC():
     name = []
     var = []
     index = []
+    new_name = []
+    #  Przy dużej ilości danych spowalnia rozruch apki
 
     for i in range(len(build_structure_name())):
-        name.append(str(build_structure_name()[i].strip().lower()))
+        name.append(str(build_structure_name()[i].strip()))
     for i in range(len(build_structure_var())):
         var.append(str(build_structure_var()[i].strip().lower()))
     for i in range(len(build_structure_index())):
         index.append(int(str(build_structure_index()[i].strip().split('.')[0])))
 
+    for i in range(len(name)):
+        new_name.append(name[i]+"_"+str(i+1))
 
-    # Tworzenie tabeli w przyszłości za pomocą strony
+   
     g_db = general_db.conn_to_sqlite()
-    general_db.create_table(name)
-  
+    # Tworzenie tabeli w przyszłości za pomocą strony
+    general_db.create_table(new_name)
+
+    
     # -----------------------------------------------
     while running:
         
@@ -83,10 +89,12 @@ def read_data_from_PLC():
                     
                     data.clear()
                     data.insert(0, None) # Set None for auto-increment id
-                   
+                    socketio.emit('index', {'data':len(build_structure_index())})
+
                     for i in range(0,len(build_structure_index())):
                         # Wyświetlanie wysłanych danych (dane aktualne)
                         socketio.emit(f'update_data{i}', {'data': plc.read_data_from_PLC(generalS7, db_no, start_byte, end_byte, conv, f"get_{var[i]}", index[i],0)})
+                        
                         # Zapis danych z PLC do tablicy
                         data.append(str(plc.read_data_from_PLC(generalS7, db_no, start_byte, end_byte, conv, f"get_{var[i]}", index[i],0)))
                     
@@ -160,7 +168,7 @@ if __name__ == "__main__":
 
     try:
     
-            socketio.run(app, host='0.0.0.0', port=5000)
+            socketio.run(app, host='192.168.18.7', port=5000)
     except KeyboardInterrupt:
             print("\nProgram zakończony za pomocą Ctrl+C.")
     finally:
