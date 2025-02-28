@@ -20,9 +20,10 @@ def read_lines_config(value):
                 if "Struct" in cleaned_data[i]:
                     index.append(i)
                     break
-                elif "Array" in cleaned_data[i]:
+                elif "of" in cleaned_data[i]:
                     index.append(i)
                     break
+        # print(index)
         ix = len(index)
         c = 0
         for i in range(0,ix):
@@ -30,7 +31,7 @@ def read_lines_config(value):
             b = a - c
             cleaned_data.pop(b)
             c = c + 1
-
+        # print(cleaned_data)
         for i in cleaned_data:
             for j in i:
                 data.append(j)

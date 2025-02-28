@@ -10,27 +10,34 @@
       href="{{ url_for('static', filename='css/style.css') }}"
     />
     <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
-    <!-- <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f0f0f0;
+    <style>
+       .container {
+            display:flex ;
+            gap: 100px; /* Odstęp między elementami */
+            border: 1px;
+            justify-content: center; /* Wyśrodkowanie */
+            align-items: top; /* Wyrównanie w pionie */
         }
-        .card {
-            background: white;
+
+      
+        
+        .value1, .value2 {
+            
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            background-color: #333;
             text-align: center;
+            border-radius: 1px;
+            
         }
-        .value {
-            font-size: 2em;
-            color: #333;
+        .names, .card {
+            
+            padding: 20px;
+            background-color: #333;
+            text-align: center;
+            border-radius: 1px;
+            
         }
-    </style> -->
+    </style>
 </head>
 <body>
     
@@ -44,24 +51,16 @@
         
         <div id="lamp"></div>
       </div>
-    <div class="card">
-        <h2>Aktualne dane z PLC:</h2>
-        <div class="value" id="plc-data0">Ładowanie...</div>
-        <div class="value" id="plc-data1">Ładowanie...</div>
-        <div class="value" id="plc-data2">Ładowanie...</div>
-        <div class="value" id="plc-data3">Ładowanie...</div>
-        <div class="value" id="plc-data4">Ładowanie...</div>
-        <div class="value" id="plc-data5">Ładowanie...</div>
-        <div class="value" id="plc-data6">Ładowanie...</div>
-        <div class="value" id="plc-data7">Ładowanie...</div>
-        <div class="value" id="plc-data8">Ładowanie...</div>
-        <div class="value" id="plc-data9">Ładowanie...</div>
-        <div class="value" id="plc-data10">Ładowanie...</div>
-        <div class="value" id="plc-data11">Ładowanie...</div>
-        <div class="value" id="plc-data12">Ładowanie...</div>
-        <div class="value" id="plc-data13">Ładowanie...</div>
-        <div class="value" id="plc-data14">Ładowanie...</div>
+      <h2>Aktualne dane z PLC:</h2>
+      <div class="container">
+        <div class="names">
+            <div id="name-container">Nazwa wartości</div>
+        </div>
+        <div class="card">
+            <div id="plc-container">Wartość</div>
+        </div>
     </div>
+    
 
     <script>
         function addData(value) {
@@ -76,20 +75,42 @@
             }
         }
 
+        function socketListener(index) {
+    const container = document.getElementById("plc-container");
+    const namesContainer = document.getElementById("name-container");
+    let html1 = "";
+    let html2 = "";
+
+    // Najpierw wygeneruj wszystkie pola
+    for (let i = 0; i < index; i++) {
+        html1 += `<div class="value1" id="name${i}"></div>`;
+        html2 += `<div class="value2" id="plc-data${i}"></div>`;
+    }
+    namesContainer.innerHTML = html1;
+    container.innerHTML = html2;  // Wstaw gotowy HTML, zamiast dodawać pojedynczo
+
+
+    // Teraz ustaw nasłuchiwanie na każdą zmienną
+    for (let i = 0; i < index; i++) {
+        socket.on('update_data' + i, function(msg) {
+            document.getElementById('plc-data' + i).innerText = msg.data;
+        });
+        socket.on('names', function(msg){
+            document.getElementById('name' + i).innerText = msg.data[i];
+        });
+    }
+}
+
         var socket = io.connect('http://' + document.domain + ':' + location.port);
         socket.on('live_bit', function(msg) {
             addData(msg.data);
         });
-        var index = 0
+        
         socket.on('index',function(msg){
-            index = msg.data
-        })
-        // Nasłuchiwanie na dane od SocketIO
-         for(let i = 0; i < index; i++){
-         socket.on('update_data'+i, function(msg) {
-             document.getElementById('plc-data'+i).innerText = msg.data;
-         });
-     }
+            socketListener(msg.data);
+        });
+        
+        
     </script>
 </body>
 </html>

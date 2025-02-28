@@ -53,13 +53,19 @@ def read_data_from_PLC():
 
     for i in range(len(build_structure_name())):
         name.append(str(build_structure_name()[i].strip()))
+
     for i in range(len(build_structure_var())):
         var.append(str(build_structure_var()[i].strip().lower()))
+
     for i in range(len(build_structure_index())):
         index.append(int(str(build_structure_index()[i].strip().split('.')[0])))
+    
 
     for i in range(len(name)):
-        new_name.append(name[i]+"_"+str(i+1))
+        new_name.append(name[i].replace("[", "").replace("]", "") +"_"+str(i+1))
+        
+  
+
 
    
     g_db = general_db.conn_to_sqlite()
@@ -89,7 +95,9 @@ def read_data_from_PLC():
                     
                     data.clear()
                     data.insert(0, None) # Set None for auto-increment id
-                    socketio.emit('index', {'data':len(build_structure_index())})
+                    
+                    socketio.emit('index', {'data':str(len(index))})
+                    socketio.emit('names', {'data':new_name})
 
                     for i in range(0,len(build_structure_index())):
                         # Wyświetlanie wysłanych danych (dane aktualne)
@@ -168,7 +176,7 @@ if __name__ == "__main__":
 
     try:
     
-            socketio.run(app, host='192.168.18.7', port=5000)
+            socketio.run(app, host='0.0.0.0', port=5000)
     except KeyboardInterrupt:
             print("\nProgram zakończony za pomocą Ctrl+C.")
     finally:
