@@ -298,7 +298,7 @@ def get_s5time(bytearray_: bytearray, byte_index: int) -> str:
     # here we must return a string like variable, otherwise nothing will return
     return "".join(str(s5time))
 
-def get_dt(bytearray_: bytearray, byte_index: int) -> str:
+def get_date_and_time(bytearray_: bytearray, byte_index: int) -> str:
     """Get  DATE_AND_TIME Value from bytearray as ISO 8601 formatted Date String
     Notes:
         Datatype `DATE_AND_TIME` consists in 8 bytes in the PLC.

@@ -80,8 +80,12 @@
         socket.on('live_bit', function(msg) {
             addData(msg.data);
         });
+        var index = 0
+        socket.on('index',function(msg){
+            index = msg.data
+        })
         // Nasłuchiwanie na dane od SocketIO
-         for(let i = 0; i <16; i++){
+         for(let i = 0; i < index; i++){
          socket.on('update_data'+i, function(msg) {
              document.getElementById('plc-data'+i).innerText = msg.data;
          });

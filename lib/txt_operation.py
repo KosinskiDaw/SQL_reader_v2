@@ -1,22 +1,44 @@
 
-def read_lines_config(index):
+def read_lines_config(value):
     # path = ("../config/vars.txt")
     path = ("config/vars.txt")
     data = []
+    index = []
     transformed_data = []
     try:
         f = open(path,"r")
         for x in f:
             data.append(x)
         cleaned_data = [line.strip().split() for line in data]
+        f.close()
         data.clear()
+        
+        l = len(cleaned_data)
+
+        for i in range(0, l):
+            for j in cleaned_data:
+                if "Struct" in cleaned_data[i]:
+                    index.append(i)
+                    break
+                elif "Array" in cleaned_data[i]:
+                    index.append(i)
+                    break
+        ix = len(index)
+        c = 0
+        for i in range(0,ix):
+            a = index[i]
+            b = a - c
+            cleaned_data.pop(b)
+            c = c + 1
+
         for i in cleaned_data:
             for j in i:
                 data.append(j)
-        for k in range(index, len(data), 3):
+        for k in range(value, len(data), 3):
             transformed_data.append(data[k])
-        f.close()
+        
         return transformed_data
+
     except Exception as e:
         print(f"Error reading data from file: {str(e)}")
         return False

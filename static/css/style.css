@@ -38,6 +38,9 @@ tr:hover {
     z-index: 1; /* Wyższy z-index niż nagłówek tabeli */
     background-color: #333; /* Tło dla lepszej widoczności */
     text-align: center; /* Centruje przyciski w poziomie */ 
+    display: flex;
+    justify-content: center;
+    align-items: center;
     padding-top: 10px;
     padding-bottom: 10px;
 }
@@ -126,5 +129,5 @@ body{
 }
 
 .selected {
-    background-color: #04AA6D; /* Jasnoszary */
+    background-color: #04AA6D; 
 }
