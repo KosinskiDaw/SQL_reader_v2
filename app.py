@@ -49,6 +49,7 @@ def read_data_from_PLC():
     var = []
     index = []
     new_name = []
+
     #  Przy dużej ilości danych spowalnia rozruch apki
 
     for i in range(len(build_structure_name())):
@@ -60,20 +61,15 @@ def read_data_from_PLC():
     for i in range(len(build_structure_index())):
         index.append(int(str(build_structure_index()[i].strip().split('.')[0])))
     
-
     for i in range(len(name)):
         new_name.append(name[i].replace("[", "").replace("]", "") +"_"+str(i+1))
         
-  
-
-
-   
     g_db = general_db.conn_to_sqlite()
-    # Tworzenie tabeli w przyszłości za pomocą strony
+    # # Tworzenie tabeli w przyszłości za pomocą strony
     general_db.create_table(new_name)
-
-    
     # -----------------------------------------------
+
+
     while running:
         
         
@@ -101,7 +97,7 @@ def read_data_from_PLC():
 
                     for i in range(0,len(build_structure_index())):
                         # Wyświetlanie wysłanych danych (dane aktualne)
-                        socketio.emit(f'update_data{i}', {'data': plc.read_data_from_PLC(generalS7, db_no, start_byte, end_byte, conv, f"get_{var[i]}", index[i],0)})
+                        # socketio.emit(f'update_data{i}', {'data': plc.read_data_from_PLC(generalS7, db_no, start_byte, end_byte, conv, f"get_{var[i]}", index[i],0)})
                         
                         # Zapis danych z PLC do tablicy
                         data.append(str(plc.read_data_from_PLC(generalS7, db_no, start_byte, end_byte, conv, f"get_{var[i]}", index[i],0)))
@@ -112,9 +108,10 @@ def read_data_from_PLC():
                     general_db.insert_data(cursor, *data)
                     
                     
+                    
                    
                     # Delete request 
-                    generalS7.write_data(db_no, 0, bytearray([0]))
+                    generalS7.write_data(db_no, 2304, bytearray([1]))
                     
             except Exception as e:
                 print(f"Error reading data from PLC: {str(e)}")
