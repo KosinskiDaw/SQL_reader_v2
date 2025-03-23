@@ -94,13 +94,18 @@ def read_data_from_PLC():
                     
                     socketio.emit('index', {'data':str(len(index))})
                     socketio.emit('names', {'data':new_name})
-
+                    bool_place =0 
                     for i in range(0,len(build_structure_index())):
                         # Wyświetlanie wysłanych danych (dane aktualne)
                         # socketio.emit(f'update_data{i}', {'data': plc.read_data_from_PLC(generalS7, db_no, start_byte, end_byte, conv, f"get_{var[i]}", index[i],0)})
                         
                         # Zapis danych z PLC do tablicy
-                        data.append(str(plc.read_data_from_PLC(generalS7, db_no, start_byte, end_byte, conv, f"get_{var[i]}", index[i],0)))
+                        
+                        data.append(str(plc.read_data_from_PLC(generalS7, db_no, start_byte, end_byte, conv, f"get_{var[i]}", index[i], bool_place)))
+                        if "bool" in var[i]:
+                             bool_place = bool_place +1
+                        else:
+                             bool_place = 0 
                     
                     # print(data)
                     # Zapis danych do sql
