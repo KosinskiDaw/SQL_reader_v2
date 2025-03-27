@@ -6,14 +6,21 @@
     <title>Data Display</title>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/style.css') }}">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+    <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
 </head>
 <body>
+    <div class="a">
     <div class="topnav">
         <a href="/">Home</a>
         <a class="active" href="/data">Data</a>
         <a href="/settings">Settings</a>
+        
     </div>
-    
+    <div class="lamp_pack">
+        
+        <div id="lamp"></div>
+      </div> 
+</div>
     <div id="table-container">Ładowanie danych...</div>
     
     <div class="header-buttons">
@@ -25,5 +32,22 @@
  
 
     <script type="text/javascript" src="{{ url_for('static', filename='js/data.js') }}"></script>
+    <script>
+        function liveBit(value) {
+            const lamp = document.querySelector('#lamp')
+            
+            a = value;
+
+            if (a != null && a !=0) {
+                lamp.style.background = "green";
+            } else {
+                lamp.style.background = "red";
+            }
+        }
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+        socket.on('live_bit', function(msg) {
+            liveBit(msg.data);
+        });
+    </script>
 </body>
 </html>
